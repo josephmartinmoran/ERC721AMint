@@ -12,15 +12,22 @@ contract NFTA is ERC721A, Ownable, ReentrancyGuard {
     string private _baseURIextended;
 
     bool public isAllowListActive = false;
-    uint256 public constant collectionsize = 10000;
-    uint256 public constant maxBatchsize = 5;
-    uint256 public constant PRICE_PER_TOKEN = 0.1 ether;
+    uint256 public collectionSize;
+    uint256 public maxBatchSize;
+    uint256 public PRICE_PER_TOKEN;
     uint256 public amountForDevs;
+    string name;
+    string symbol;
 
     mapping(address => uint8) private _allowList;
 
-    constructor(uint256 amountForDevs_) ERC721A("name", "symbol", 5, 10000) {
-     amountForDevs = amountForDevs_;
+    constructor(string memory name_, string memory symbol_, uint256 maxBatchSize_, uint256 collectionSize_, uint256 PRICE_PER_TOKEN_) 
+    ERC721A("name_", "symbol_", maxBatchSize_, collectionSize_, PRICE_PER_TOKEN_) {
+    name = name_;
+    symbol = symbol_;
+    maxBatchSize = maxBatchSize_;
+    collectionSize = collectionSize_;
+    PRICE_PER_TOKEN = PRICE_PER_TOKEN_; 
     }
 
     function setIsAllowListActive(bool _isAllowListActive) external onlyOwner {
@@ -41,7 +48,7 @@ contract NFTA is ERC721A, Ownable, ReentrancyGuard {
         uint256 ts = totalSupply();
         require(isAllowListActive, "Allow list is not active");
         require(numberOfTokens <= _allowList[msg.sender], "Exceeded max available to purchase");
-        require(ts + numberOfTokens <= collectionsize, "Purchase would exceed max tokens");
+        require(ts + numberOfTokens <= collectionSize, "Purchase would exceed max tokens");
         require(PRICE_PER_TOKEN * numberOfTokens <= msg.value, "Ether value sent is not correct");
 
         _allowList[msg.sender] -= numberOfTokens;
@@ -57,12 +64,12 @@ contract NFTA is ERC721A, Ownable, ReentrancyGuard {
         "too many already minted before dev mint"
     );
         require(
-        quantity % maxBatchsize == 0,
+        quantity % maxBatchSize == 0,
         "can only mint a multiple of the maxBatchsize"
     );
-        uint256 numChunks = quantity / maxBatchsize;
+        uint256 numChunks = quantity / maxBatchSize;
         for (uint256 i = 0; i < numChunks; i++) {
-        _safeMint(msg.sender, maxBatchsize);
+        _safeMint(msg.sender, maxBatchSize);
     }
   }
 
@@ -93,8 +100,8 @@ contract NFTA is ERC721A, Ownable, ReentrancyGuard {
     function mint(uint numberOfTokens) public payable {
         uint256 ts = totalSupply();
         require(saleIsActive, "Sale must be active to mint tokens");
-        require(numberOfTokens <= maxBatchsize, "Exceeded max token purchase");
-        require(ts + numberOfTokens <= collectionsize, "Purchase would exceed max tokens");
+        require(numberOfTokens <= maxBatchSize, "Exceeded max token purchase");
+        require(ts + numberOfTokens <= collectionSize, "Purchase would exceed max tokens");
         require(PRICE_PER_TOKEN * numberOfTokens <= msg.value, "Ether value sent is not correct");
 
         for (uint256 i = 0; i < numberOfTokens; i++) {
