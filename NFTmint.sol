@@ -34,6 +34,10 @@ contract NFTA is ERC721A, Ownable, ReentrancyGuard {
         isAllowListActive = _isAllowListActive;
     }
 
+    function setamountForDevs(uint256 _amountForDevs) external onlyOwner {
+        amountForDevs = _amountForDevs;
+    }
+
     function setAllowList(address[] calldata addresses, uint8 numAllowedToMint) external onlyOwner {
         for (uint256 i = 0; i < addresses.length; i++) {
             _allowList[addresses[i]] = numAllowedToMint;
