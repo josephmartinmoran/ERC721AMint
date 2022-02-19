@@ -50,8 +50,9 @@ contract ERC721A is Context, ERC165, IERC721, IERC721Metadata, IERC721Enumerable
 
     uint256 private _currentIndex = 0;
 
-    uint256 internal immutable collectionSize;
-    uint256 internal immutable maxBatchSize;
+    uint256 private _collectionSize;
+    uint256 private _maxBatchSize;
+    uint256 private _PRICE_PER_TOKEN;
 
     // Token name
     string private _name;
@@ -75,11 +76,12 @@ contract ERC721A is Context, ERC165, IERC721, IERC721Metadata, IERC721Enumerable
 
     //maxBatchSize` refers to how much a minter can mint at a time.
     //collectionSize_` refers to how many tokens are in the collection.
-    constructor(string memory name_, string memory symbol_, uint256 maxBatchSize_, uint256 collectionSize_) {
+    constructor(string memory name_, string memory symbol_, uint256 maxBatchSize_, uint256 collectionSize_, uint256 PRICE_PER_TOKEN_) {
         _name = name_;
         _symbol = symbol_;
-        maxBatchSize = maxBatchSize_;
-        collectionSize = collectionSize_;
+        _maxBatchSize = maxBatchSize_;
+        _collectionSize = collectionSize_;
+        _PRICE_PER_TOKEN = PRICE_PER_TOKEN_;
   }
 
     //See {IERC721Enumerable-totalSupply}.
@@ -149,8 +151,8 @@ contract ERC721A is Context, ERC165, IERC721, IERC721Metadata, IERC721Enumerable
         require(_exists(tokenId), "ERC721A: owner query for nonexistent token");
 
         uint256 lowestTokenToCheck;
-          if (tokenId >= maxBatchSize) {
-            lowestTokenToCheck = tokenId - maxBatchSize + 1;
+          if (tokenId >= _maxBatchSize) {
+            lowestTokenToCheck = tokenId - _maxBatchSize + 1;
         }
             for (uint256 curr = tokenId; curr >= lowestTokenToCheck; curr--) {
                 TokenOwnership memory ownership = _ownerships[curr];
@@ -396,8 +398,8 @@ contract ERC721A is Context, ERC165, IERC721, IERC721Metadata, IERC721Enumerable
     uint256 oldNextOwnerToSet = nextOwnerToExplicitlySet;
     require(quantity > 0, "quantity must be nonzero");
     uint256 endIndex = oldNextOwnerToSet + quantity - 1;
-    if (endIndex > collectionSize - 1) {
-      endIndex = collectionSize - 1;
+    if (endIndex > _collectionSize - 1) {
+      endIndex = _collectionSize - 1;
     }
     // We know if the last one in the group exists, all in the group exist, due to serial ordering.
     require(_exists(endIndex), "not enough minted yet for this cleanup");
