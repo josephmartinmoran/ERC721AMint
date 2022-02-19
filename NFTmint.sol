@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: MIT OR Apache-2.0
 pragma solidity ^0.8.0;
 
 import './ERC721A.sol';
@@ -6,7 +6,7 @@ import '@openzeppelin/contracts/access/Ownable.sol';
 import '@openzeppelin/contracts/security/ReentrancyGuard.sol';
 import '@openzeppelin/contracts/utils/Strings.sol';
 
-contract EineSigns is ERC721A, Ownable {
+contract NFTA is ERC721A, Ownable, ReentrancyGuard {
     string public PROVENANCE;
     bool public saleIsActive = false;
     string private _baseURIextended;
@@ -102,18 +102,11 @@ contract EineSigns is ERC721A, Ownable {
         }
     }
 
-  function withdraw() public payable onlyOwner {
-    // This will pay saucedoa 20% of the initial sale.
-    (bool hs, ) = payable(0x6B3945269CA59F7d65de03E7fbcbcF7570e703fD).call{value: address(this).balance * 20 / 100}("");
-    require(hs);
-    // =============================================================================
-    
-    // This will payout the owner 80% of the contract balance.
-    // Do not remove this otherwise you will not be able to withdraw the funds.
-    // =============================================================================
-    (bool os, ) = payable(owner()).call{value: address(this).balance}("");
-    require(os);
+  function withdrawMoney() external onlyOwner nonReentrant {
+    (bool success, ) = msg.sender.call{value: address(this).balance}("");
+    require(success, "Transfer failed.");
   }
+
       function setOwnersExplicit(uint256 quantity) external onlyOwner {
     _setOwnersExplicit(quantity);
   }
