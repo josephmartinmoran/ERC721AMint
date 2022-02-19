@@ -6,7 +6,7 @@ import '@openzeppelin/contracts/access/Ownable.sol';
 import '@openzeppelin/contracts/security/ReentrancyGuard.sol';
 import '@openzeppelin/contracts/utils/Strings.sol';
 
-contract NFTA is ERC721A, Ownable, ReentrancyGuard {
+contract NFT is ERC721A, Ownable, ReentrancyGuard {
     string public PROVENANCE;
     bool public saleIsActive = false;
     string private _baseURIextended;
@@ -16,18 +16,17 @@ contract NFTA is ERC721A, Ownable, ReentrancyGuard {
     uint256 public maxBatchSize;
     uint256 public PRICE_PER_TOKEN;
     uint256 public amountForDevs;
-    string name;
-    string symbol;
 
     mapping(address => uint8) private _allowList;
 
-    constructor(string memory name_, string memory symbol_, uint256 maxBatchSize_, uint256 collectionSize_, uint256 PRICE_PER_TOKEN_) 
-    ERC721A("name_", "symbol_", maxBatchSize_, collectionSize_, PRICE_PER_TOKEN_) {
-    name = name_;
-    symbol = symbol_;
+    constructor(uint256 maxBatchSize_, uint256 collectionSize_) 
+    ERC721A("name", "symbol", maxBatchSize_, collectionSize_) {
     maxBatchSize = maxBatchSize_;
-    collectionSize = collectionSize_;
-    PRICE_PER_TOKEN = PRICE_PER_TOKEN_; 
+    collectionSize = collectionSize_; 
+    }
+
+    function setPRICE_PER_TOKEN(uint256 PRICE_PER_TOKEN_) external onlyOwner {
+        PRICE_PER_TOKEN = PRICE_PER_TOKEN_;
     }
 
     function setIsAllowListActive(bool _isAllowListActive) external onlyOwner {
