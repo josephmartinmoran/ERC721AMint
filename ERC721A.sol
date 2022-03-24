@@ -1,5 +1,4 @@
 // SPDX-License-Identifier: MIT
-
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
@@ -43,8 +42,8 @@ contract ERC721A is
 
   uint256 private currentIndex = 0;
 
-  uint256 internal immutable _collectionSize;
-  uint256 internal immutable _maxBatchSize;
+  uint256 internal immutable collectionSize;
+  uint256 internal immutable maxBatchSize;
 
   // Token name
   string private _name;
@@ -83,8 +82,8 @@ contract ERC721A is
     require(maxBatchSize_ > 0, "ERC721A: max batch size must be nonzero");
     _name = name_;
     _symbol = symbol_;
-    _maxBatchSize = maxBatchSize_;
-    _collectionSize = collectionSize_;
+    maxBatchSize = maxBatchSize_;
+    collectionSize = collectionSize_;
   }
 
   /**
@@ -173,8 +172,8 @@ contract ERC721A is
     require(_exists(tokenId), "ERC721A: owner query for nonexistent token");
 
     uint256 lowestTokenToCheck;
-    if (tokenId >= _maxBatchSize) {
-      lowestTokenToCheck = tokenId - _maxBatchSize + 1;
+    if (tokenId >= maxBatchSize) {
+      lowestTokenToCheck = tokenId - maxBatchSize + 1;
     }
 
     for (uint256 curr = tokenId; curr >= lowestTokenToCheck; curr--) {
@@ -359,7 +358,7 @@ contract ERC721A is
     require(to != address(0), "ERC721A: mint to the zero address");
     // We know if the first token in the batch doesn't exist, the other ones don't as well, because of serial ordering.
     require(!_exists(startTokenId), "ERC721A: token already minted");
-    require(quantity <= _maxBatchSize, "ERC721A: quantity to mint too high");
+    require(quantity <= maxBatchSize, "ERC721A: quantity to mint too high");
 
     _beforeTokenTransfers(address(0), to, startTokenId, quantity);
 
@@ -465,8 +464,8 @@ contract ERC721A is
     uint256 oldNextOwnerToSet = nextOwnerToExplicitlySet;
     require(quantity > 0, "quantity must be nonzero");
     uint256 endIndex = oldNextOwnerToSet + quantity - 1;
-    if (endIndex > _collectionSize - 1) {
-      endIndex = _collectionSize - 1;
+    if (endIndex > collectionSize - 1) {
+      endIndex = collectionSize - 1;
     }
     // We know if the last one in the group exists, all in the group exist, due to serial ordering.
     require(_exists(endIndex), "not enough minted yet for this cleanup");
